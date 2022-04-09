@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Digital Mesage Board</title>
     <style>
         .letter {
             display: flex;
@@ -20,7 +20,7 @@
             padding: 0;
             width: 7px;
             height: 7px;
-            background-color: rgb(83, 77, 77);
+            background-color: rgb(50, 47, 47);
             border-radius: 50%;
             display: block;
             transition-duration: 1s;
@@ -49,12 +49,12 @@
     <div class="all">
 
     </div>
-    <input type="text" id="input">
-    <input type="text" id="input2">
+    <input type="text" id="input" placeholder="draw as you type">
+    <input type="text" id="input2" placeholder="first type then draw">
     <button id="drawButton">Draw</button>
 
     <script type="text/javascript">
-        let lettersCount = 78;
+        let lettersCount = 81;
         let all = document.getElementsByClassName("all")[0];
         let input = document.getElementById("input");
         let input2 = document.getElementById("input2");
@@ -138,7 +138,7 @@
                 if(isWhite){
                     document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
                 }else{
-                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(83, 77, 77)";
+                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(50, 47, 47)";
                 }
             }
         }
