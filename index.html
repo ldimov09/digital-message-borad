@@ -7,22 +7,23 @@
     <title>Document</title>
     <style>
         .letter {
-            width: 60px;
-            height: 130px;
-            margin-right: 12px;
-            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap ;
+            width: 45px;
+            margin-right: 10px;
+            margin-bottom: 10px;
             padding: 0;
         }
         .dot{
-            margin:0;
+            margin-right: 2px;
+            margin-bottom: 2px;
             padding: 0;
             width: 7px;
             height: 7px;
             background-color: rgb(83, 77, 77);
             border-radius: 50%;
-            display: inline-block;
+            display: block;
             transition-duration: 1s;
-            background-color: red;
         }
         .all{
             display: flex;
@@ -49,17 +50,20 @@
 
     </div>
     <input type="text" id="input">
+    <input type="text" id="input2">
+    <button id="drawButton">Draw</button>
 
     <script type="text/javascript">
         let lettersCount = 78;
         let all = document.getElementsByClassName("all")[0];
         let input = document.getElementById("input");
+        let input2 = document.getElementById("input2");
         all.innerHTML = "";
         for(let i = 0; i < lettersCount; i++) {
             all.innerHTML += `<div class="letter">`;
             let currletter = document.getElementsByClassName("letter")[i];
             for(let j = 0; j < 35; j++){
-                currletter.innerHTML += ` <div class="dot dot${i}"></div>`;
+                currletter.innerHTML += `<div class="dot dot${i}"></div>`;
             }
             all.innerHTML += `</div>`;
         }
@@ -115,39 +119,72 @@
             for(let i = 0; i < text.length; i++){
                 if(letters.hasOwnProperty(text[i])){
                     let arrToDisplay = letters[text[i]];
-                    for(let j = 0; j < arrToDisplay.length; j++){
-                        let isWhite = arrToDisplay[j];
-                        if(isWhite){
-                            document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
-                        }else{
-                            document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(83, 77, 77)";
-                        }
-                    }
+                    displayLetter(arrToDisplay, i);
                 }else{
                     let arrToDisplay = [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0];
-                    for(let j = 0; j < arrToDisplay.length; j++){
-                        let isWhite = arrToDisplay[j];
-                        if(isWhite){
-                            document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
-                        }else{
-                            document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(83, 77, 77)";
-                        }
-                    }
+                    displayLetter(arrToDisplay, i);
                 }
                 temp = i;
             }
             for(let i = temp + 1; i < lettersCount; i++){
                 let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                for(let j = 0; j < arrToDisplay.length; j++){
-                    let isWhite = arrToDisplay[j];
-                    if(isWhite){
-                        document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
-                    }else{
-                        document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(83, 77, 77)";
+                displayLetter(arrToDisplay, i);
+            }
+        });
+
+        function displayLetter(arrToDisplay, i){
+            for(let j = 0; j < arrToDisplay.length; j++){
+                let isWhite = arrToDisplay[j];
+                if(isWhite){
+                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
+                }else{
+                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(83, 77, 77)";
+                }
+            }
+        }
+
+        let drawButton = document.getElementById("drawButton");
+
+        drawButton.addEventListener("click", function(){
+            let text = input2.value;
+            let upadteIterator, deleteIterator;
+            let currentLetter = 0;
+            let messageLetters = input2.value.length;
+            let maxLetters = lettersCount;
+            let letterToDisplay;
+            //=========================================================================================
+            function DeleteLetter(){
+                let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                displayLetter(arrToDisplay, currentLetter);
+
+                console.log("Delete current letter", currentLetter);
+                currentLetter++;
+
+                if(currentLetter === maxLetters){
+                    clearInterval(deleteIterator);
+                }
+            }
+            //=========================================================================================
+            function UpdateLetter(){
+                letterToDisplay = text[currentLetter];
+                console.log("Letter to display", letterToDisplay);
+                let arrToDisplay = letters[letterToDisplay];
+                displayLetter(arrToDisplay, currentLetter);
+
+                console.log("Update current letter", currentLetter);
+
+                currentLetter++;
+                if(currentLetter === messageLetters){
+                    clearInterval(upadteIterator);
+                    if(currentLetter < maxLetters){
+                        deleteIterator = setInterval(DeleteLetter, 100)
                     }
                 }
             }
+            //=========================================================================================
+            upadteIterator = setInterval(UpdateLetter, 100);
         });
+        
     </script>
 
 </body>
