@@ -75,6 +75,9 @@
         #addLine{
             color: rgb(8, 178, 8);
         }
+        .isRed{
+            width: auto;
+        }
         .allowedCharaters{
            display: flex;
            width: 50%;
@@ -124,8 +127,8 @@
         <option value="3" >Row 4</option>
     </select>-->
     <div id="inputs-container">
-        <div class="inputForRow"> Line 1: <input maxlength="34" type="text" id="input0" class="rowInput" placeholder="Type your message"> <button id="drawButton0" class="drawButton">Draw Single Line</button> <br> </div>
-        <div class="inputForRow"> Line 2: <input maxlength="34" type="text" id="input1" class="rowInput" placeholder="Type your message"> <button id="drawButton1" class="drawButton">Draw Single Line</button> <br> </div>
+        <div class="inputForRow"> Line 1: <input maxlength="34" type="text" id="input0" class="rowInput" placeholder="Type your message"> <button id="drawButton0" class="drawButton">Draw Single Line</button>  Red:<input type="checkbox" class="isRed"> <br> </div>
+        <div class="inputForRow"> Line 2: <input maxlength="34" type="text" id="input1" class="rowInput" placeholder="Type your message"> <button id="drawButton1" class="drawButton">Draw Single Line</button>  Red:<input type="checkbox" class="isRed"> <br> </div>
     </div>
     <br>
     <button id="addLine"> + Add line </button>  <button id="DrawAll">Draw All</button>  <button class="removeButton">Remove Last Row</button> <button class="view-allowedCharaters">Show/Hide  Allowed Charaters </button> 
@@ -134,6 +137,8 @@
         <div class="allowedCharaters">
             
         </div>
+        <p>Note: All lowercase characters will be turned into uppercase and THEN displayed in the board.
+        </p>
     </div>
 
     <div class="clock">
@@ -159,6 +164,7 @@
         let viewAllowedCharaters = document.getElementsByClassName("view-allowedCharaters")[0];
         let allowedCharatersBox = document.getElementsByClassName("allowedCharatersbox")[0];
         let isAllowedOpen = false;
+        let isRedArr = document.getElementsByClassName("isRed");
 
         allowedCharatersBox.style.display = "none";
 
@@ -237,6 +243,7 @@
             "8": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0], 
             ".": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0], 
             ":": [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+            "!": [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
         }
         //=============================
 
@@ -422,7 +429,7 @@
                 values.push(input.value);
             }
             let row = countOfrows;
-            inputContainer.innerHTML += `<div class="inputForRow"> Line ${row + 1}: <input maxlength="34" type="text" id="input${row}" class="rowInput" placeholder="Type your message"> <button id="drawButton${row}" class="drawButton">Draw Single Line</button> <br></div>`;
+            inputContainer.innerHTML += `<div class="inputForRow"> Line ${row + 1}: <input maxlength="34" type="text" id="input${row}" class="rowInput" placeholder="Type your message"> <button id="drawButton${row}" class="drawButton">Draw Single Line</button> Red:<input type="checkbox" class="isRed"> <br></div>`;
             arrOfInputs = document.getElementsByClassName("rowInput");
             arrOfButtons = document.getElementsByClassName("drawButton");
             arrOfReomveButtons = document.getElementsByClassName("removeButton");
@@ -457,10 +464,11 @@
             let messageLetters = text.length;
             let maxLetters = lettersCountPerRow;
             let letterToDisplay;
+            let isRed = isRedArr[row].checked;
             //=========================================================================================
             function DeleteLetter(){
                 let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                displayLetter(arrToDisplay, dotNumber);
+                displayLetter(arrToDisplay, dotNumber, false);
 
                 // ("Delete current letter", currentLetter);
                 currentLetter++;
@@ -491,9 +499,9 @@
                 }
                 if(arrToDisplay === undefined){
                     arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                    displayLetter(arrToDisplay, dotNumber);
+                    displayLetter(arrToDisplay, dotNumber, isRed);
                 }else{
-                    displayLetter(arrToDisplay, dotNumber);
+                    displayLetter(arrToDisplay, dotNumber, isRed);
                 }
                 dotNumber++;
                 
@@ -502,11 +510,15 @@
             upadteIterator = setInterval(UpdateLetter, 100);
         }
 
-        function displayLetter(arrToDisplay, i){
+        function displayLetter(arrToDisplay, i, isRed){
             for(let j = 0; j < arrToDisplay.length; j++){
                 let isWhite = arrToDisplay[j];
                 if(isWhite){
-                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
+                    if(!isRed){
+                        document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
+                    }else{
+                        document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(254, 64, 31)";
+                    }
                 }else{
                     document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(50, 47, 47)";
                 }
