@@ -99,6 +99,16 @@
             display: flex;
             flex-direction: column;
         }
+        .clock {
+            display: flex;
+            width: 100%;
+            flex-direction: row;
+            flex-wrap: wrap;
+            margin-top: 120px;
+        }
+        .clockDot{  
+            transition-duration: 0.5s;
+        }
 
     </style>
 </head>
@@ -124,6 +134,11 @@
         <div class="allowedCharaters">
             
         </div>
+    </div>
+
+    <div class="clock">
+
+
     </div>
     
     <script type="text/javascript">
@@ -223,6 +238,99 @@
             ".": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0], 
             ":": [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
         }
+        //=============================
+
+
+
+
+        //clock
+
+        let clock = document.getElementsByClassName("clock")[0];
+        let date = new Date();
+
+        for (let i = 0; i < 8; i++) {
+            clock.innerHTML += `<div class="letter">`;
+            let currletter = document.getElementsByClassName("letter")[i];
+            currletter.innerHTML = "";
+            for (let j = 0; j < 35; j++) {
+                currletter.innerHTML += `<div class="dot clockDot clockDot${i}"></div>`;
+            }
+            clock.innerHTML += `</div>`;
+        }
+
+        function displayTime() {
+            date = new Date();
+            let hours, minutes, seconds;
+            hours = +date.getHours(); minutes = +date.getMinutes(); seconds = +date.getSeconds();
+            if(hours < 10){
+                hours = "0" + hours;
+            }
+            if(minutes < 10){
+                minutes = "0" + minutes;
+            }
+            if(seconds < 10){
+                seconds = "0" + seconds;
+            }
+            let rowNumber = 0;
+            let text = `${hours}:${minutes}:${seconds}`;
+            let upadteIterator, deleteIterator;
+            let currentLetter = 0;
+            let dotNumber = 0;
+            let messageLetters = 8;
+            let maxLetters = 8;
+            let letterToDisplay;
+            //=========================================================================================
+            function DeleteLetter() {
+                let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                Clock(arrToDisplay, dotNumber);
+
+                 ("Delete current letter", currentLetter);
+                currentLetter++;
+                dotNumber++;
+
+                if (currentLetter === maxLetters) {
+                    clearInterval(deleteIterator);
+                }
+            }
+            //=========================================================================================
+            function UpdateLetter() {
+                letterToDisplay = text[currentLetter];
+                 ("Letter to display", letterToDisplay, dotNumber);
+                let arrToDisplay = letters[letterToDisplay];
+                 ("Arr to display", arrToDisplay, dotNumber);
+
+
+                currentLetter++;
+                if (currentLetter >= maxLetters) {
+                    clearInterval(upadteIterator);
+                }
+
+                if (currentLetter >= messageLetters) {
+                    clearInterval(upadteIterator);
+                    if (currentLetter < maxLetters) {
+                        deleteIterator = setInterval(DeleteLetter, 50);
+                    }
+                }
+                if (arrToDisplay === undefined) {
+                    arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    displayLetterClock(arrToDisplay, dotNumber);
+                } else {
+                    displayLetterClock(arrToDisplay, dotNumber);
+                }
+                dotNumber++;
+
+            }
+            //=========================================================================================
+            upadteIterator = setInterval(UpdateLetter, 50);
+        }
+
+        let timeIterator = setInterval(displayTime, 1000);
+
+
+
+        //==============================
+
+
 
         //add event listeners
 
@@ -281,6 +389,17 @@
 
         //functions
 
+        function displayLetterClock(arrToDisplay, i){
+            for(let j = 0; j < arrToDisplay.length; j++){
+                let isWhite = arrToDisplay[j];
+                if(isWhite){
+                    document.getElementsByClassName(`clockDot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
+                }else{
+                    document.getElementsByClassName(`clockDot${i}`)[j].style.backgroundColor =  "rgb(50, 47, 47)";
+                }
+            }
+        }
+
         function addeventButtonsClick(){
             for(let i = 0; i < arrOfButtons.length; i++){
                 arrOfButtons[i].addEventListener("click", function (){
@@ -331,6 +450,7 @@
         function typeLine(row){
             let rowNumber = Number(row);
             let text = arrOfInputs[row].value;
+            text = text.toUpperCase();
             let upadteIterator, deleteIterator;
             let currentLetter = 0;
             let dotNumber = rowNumber * lettersCountPerRow;
@@ -342,7 +462,7 @@
                 let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 displayLetter(arrToDisplay, dotNumber);
 
-                //console.log("Delete current letter", currentLetter);
+                // ("Delete current letter", currentLetter);
                 currentLetter++;
                 dotNumber++;
 
@@ -353,9 +473,7 @@
             //=========================================================================================
             function UpdateLetter(){
                 letterToDisplay = text[currentLetter];
-                console.log("Letter to display", letterToDisplay, dotNumber);
                 let arrToDisplay = letters[letterToDisplay];
-                console.log("Arr to display", arrToDisplay, dotNumber);
 
                 
                 currentLetter++;
