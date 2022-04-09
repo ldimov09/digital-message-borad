@@ -1,1 +1,1 @@
-# digital-message-borad
+# digital-message-board
