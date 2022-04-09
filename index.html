@@ -28,12 +28,22 @@
         .all{
             display: flex;
             width: 100%;
-            flex-direction: row;
+            flex-direction: column;
             flex-wrap: wrap;
             margin-bottom: 20px;
         }
+        .row{
+            display: flex;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
         body{
             background-color: black;
+            color: white;
+            font-size: 28px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bolder;
         }
         input{
             position: relative;
@@ -52,6 +62,18 @@
             font-family: 'Courier New', Courier, monospace;
             font-weight: bolder;
         }
+        #DrawAll{
+            color: rgb(87, 157, 203);
+        }
+        .drawButton{
+            color: rgb(87, 157, 203);
+        }
+        .removeButton{
+            color: rgb(154, 7, 7);
+        }
+        #addLine{
+            color: rgb(8, 178, 8);
+        }
 
     </style>
 </head>
@@ -60,32 +82,192 @@
 
     </div>
     <!--<input type="text" id="input" placeholder="draw as you type">-->
-    <select id="row-select">
+    <!--<select id="row-select">
         <option value="0" >Row 1</option>
         <option value="1" >Row 2</option>
         <option value="2" >Row 3</option>
         <option value="3" >Row 4</option>
-    </select>
-    <input maxlength="34" type="text" id="input2" placeholder="Type your message and hit [Draw]">
-    <button id="drawButton">Draw</button>
+    </select>-->
+    <div id="inputs-container">
+        <div class="inputForRow"> Line 1: <input maxlength="34" type="text" id="input0" class="rowInput" placeholder="Type your message and hit [Draw]"> <button id="drawButton0" class="drawButton">Draw Single Line</button> <br> </div>
+        <div class="inputForRow"> Line 2: <input maxlength="34" type="text" id="input1" class="rowInput" placeholder="Type your message and hit [Draw]"> <button id="drawButton1" class="drawButton">Draw Single Line</button> <br> </div>
+    </div>
+    <br>
+    <button id="addLine"> + Add line </button>  <button id="DrawAll">Draw All</button>  <button class="removeButton">Remove Last Row</button><br></div>
+    
 
     <script type="text/javascript">
         let lettersCountPerRow = 34;
-        let allLetters = 136;
+        let allLetters = 68;
+        let countOfrows = 2;
         let all = document.getElementsByClassName("all")[0];
         let input = document.getElementById("input");
         let input2 = document.getElementById("input2");
         let row = document.getElementById("row-select");  
+        let arrOfButtons = document.getElementsByClassName("drawButton");
+        let arrOfInputs = document.getElementsByClassName("rowInput");
+        let inputContainer = document.getElementById("inputs-container");
+        let addLine = document.getElementById("addLine");
+        let drawButton = document.getElementById("DrawAll");
+        let removeButton = document.getElementsByClassName("removeButton")[0];
+
+
+        //add event listeners
+
+        addeventButtonsClick();
+
+        addeventButtonsCloseClick();
+
+
+        addLine.addEventListener("click", function(){
+            allLetters += lettersCountPerRow;
+            drawOneRow(countOfrows);
+            newInput();
+            addeventButtonsClick();
+        })
+
+
+        drawButton.addEventListener("click", function(){
+           for(let i = 0; i < countOfrows; i++){
+               typeLine(i);
+           }
+        });
+
+
+        //=============================================================
+
+        //draw 2 lines
+
         all.innerHTML = "";
-        for(let i = 0; i < allLetters; i++) {
-            all.innerHTML += `<div class="letter">`;
-            let currletter = document.getElementsByClassName("letter")[i];
-            for(let j = 0; j < 35; j++){
-                currletter.innerHTML += `<div class="dot dot${i}"></div>`;
+
+        for(let i = 0; i < countOfrows; i++){
+            drawOneRow(i);
+        }
+        
+
+        //=============================================================
+
+
+        //functions
+
+        function addeventButtonsClick(){
+            for(let i = 0; i < arrOfButtons.length; i++){
+                arrOfButtons[i].addEventListener("click", function (){
+                    typeLine(i);
+                });
+            }
+        }
+
+        function addeventButtonsCloseClick(){
+            removeButton.addEventListener("click", function (){
+                document.getElementsByClassName("row")[countOfrows - 1].remove();
+                document.getElementsByClassName("inputForRow")[countOfrows - 1].remove();
+                countOfrows--;
+            });
+        }
+
+        function newInput(){
+            let values = [];
+            for(let input of arrOfInputs){
+                values.push(input.value);
+            }
+            let row = countOfrows;
+            inputContainer.innerHTML += `<div class="inputForRow"> Line ${row + 1}: <input maxlength="34" type="text" id="input${row}" class="rowInput" placeholder="Type your message and hit [Draw]"> <button id="drawButton${row}" class="drawButton">Draw Single Line</button> <br></div>`;
+            arrOfInputs = document.getElementsByClassName("rowInput");
+            arrOfButtons = document.getElementsByClassName("drawButton");
+            arrOfReomveButtons = document.getElementsByClassName("removeButton");
+            for(let i = 0; i < values.length; i++){
+                arrOfInputs[i].value = values[i];
+            }
+            countOfrows++;
+        }
+
+        function drawOneRow(row){
+            all.innerHTML += `<div id="row${row}" class="row">`;
+            let rowDiv = document.getElementById(`row${row}`);
+            for(let i = 0; i < lettersCountPerRow; i++){
+                rowDiv.innerHTML += `<div class="letter">`;
+                let currletter = document.getElementsByClassName("letter")[i + row * lettersCountPerRow];
+                currletter.innerHTML = "";
+                for(let j = 0; j < 35; j++){
+                    currletter.innerHTML += `<div class="dot dot${i + row * lettersCountPerRow}"></div>`;
+                }
+                rowDiv.innerHTML += `</div>`;
             }
             all.innerHTML += `</div>`;
         }
 
+        function typeLine(row){
+            let rowNumber = Number(row);
+            let text = arrOfInputs[row].value;
+            let upadteIterator, deleteIterator;
+            let currentLetter = 0;
+            let dotNumber = rowNumber * lettersCountPerRow;
+            let messageLetters = text.length;
+            let maxLetters = lettersCountPerRow;
+            let letterToDisplay;
+            //=========================================================================================
+            function DeleteLetter(){
+                let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                displayLetter(arrToDisplay, dotNumber);
+
+                //console.log("Delete current letter", currentLetter);
+                currentLetter++;
+                dotNumber++;
+
+                if(currentLetter === maxLetters){
+                    clearInterval(deleteIterator);
+                }
+            }
+            //=========================================================================================
+            function UpdateLetter(){
+                letterToDisplay = text[currentLetter];
+                console.log("Letter to display", letterToDisplay, dotNumber);
+                let arrToDisplay = letters[letterToDisplay];
+                console.log("Arr to display", arrToDisplay, dotNumber);
+
+                
+                currentLetter++;
+                if(currentLetter >= maxLetters){
+                    clearInterval(upadteIterator);
+                }
+
+                
+                
+                if(currentLetter >= messageLetters){
+                    clearInterval(upadteIterator);
+                    if(currentLetter < maxLetters){
+                        deleteIterator = setInterval(DeleteLetter, 100)
+                    }
+                }
+                if(arrToDisplay === undefined){
+                    arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    displayLetter(arrToDisplay, dotNumber);
+                }else{
+                    displayLetter(arrToDisplay, dotNumber);
+                }
+                dotNumber++;
+                
+            }
+            //=========================================================================================
+            upadteIterator = setInterval(UpdateLetter, 100);
+        }
+
+        function displayLetter(arrToDisplay, i){
+            for(let j = 0; j < arrToDisplay.length; j++){
+                let isWhite = arrToDisplay[j];
+                if(isWhite){
+                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
+                }else{
+                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(50, 47, 47)";
+                }
+            }
+        }
+
+        //=============================================================
+
+        //data base
+          
         let letters = {
             "A": [0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
             "B": [1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0],
@@ -112,10 +294,20 @@
             "W": [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1],
             "X": [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
             "Y": [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
-            "Z": [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+            "А": [0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            "В": [1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0],
+            "С": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0],
+            "Е": [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1],
+            "Н": [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            "К": [1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+            "М": [1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            "О": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0],
+            "Р": [1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+            "Т": [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+            "Х": [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
             "-": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             " ": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            "0": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0],
+            "0": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0],
             "1": [0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1], 
             "2": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1], 
             "3": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0], 
@@ -126,89 +318,35 @@
             "9": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0], 
             "8": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0], 
             ".": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0], 
-            ":": [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
-         }
-
-        /*input.addEventListener("input", function (){
-            let text = input.value;
-            console.log(text);
-            text = text.split("");
-            let temp = -1;
-            for(let i = 0; i < text.length; i++){
-                if(letters.hasOwnProperty(text[i])){
-                    let arrToDisplay = letters[text[i]];
-                    displayLetter(arrToDisplay, i);
-                }else{
-                    let arrToDisplay = [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0];
-                    displayLetter(arrToDisplay, i);
-                }
-                temp = i;
-            }
-            for(let i = temp + 1; i < lettersCouPerRow; i++){
-                let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                displayLetter(arrToDisplay, i);
-            }
-        });*/
-
-        function displayLetter(arrToDisplay, i){
-            for(let j = 0; j < arrToDisplay.length; j++){
-                let isWhite = arrToDisplay[j];
-                if(isWhite){
-                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor = "rgb(255, 208, 0)";
-                }else{
-                    document.getElementsByClassName(`dot${i}`)[j].style.backgroundColor =  "rgb(50, 47, 47)";
-                }
-            }
+            ":": [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+            "Б": [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0],
+            "Г": [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+            "Д": [0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
+            "Ж": [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
+            "З": [0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0],
+            "И": [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            "Й": [1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            "Л": [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            "П": [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+            "У": [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+            "Ф": [0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0],
+            "Ц": [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1],
+            "Ч": [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+            "Ш": [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+            "Щ": [1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+            "Ъ": [1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 0],
+            "Ь": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0],
+            "Ю": [1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0],
+            "Я": [0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1],
         }
 
-        let drawButton = document.getElementById("drawButton");
+        //============================================================================
+        //For later
 
-        drawButton.addEventListener("click", function(){
-            let rowNumber = Number(row.value);
-            let text = input2.value;
-            let upadteIterator, deleteIterator;
-            let currentLetter = 0;
-            let dotNumber = rowNumber * lettersCountPerRow;
-            let messageLetters = input2.value.length;
-            let maxLetters = lettersCountPerRow;
-            let letterToDisplay;
-            //=========================================================================================
-            function DeleteLetter(){
-                let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                displayLetter(arrToDisplay, dotNumber);
 
-                //console.log("Delete current letter", currentLetter);
-                currentLetter++;
-                dotNumber++;
 
-                if(currentLetter === maxLetters){
-                    clearInterval(deleteIterator);
-                }
-            }
-            //=========================================================================================
-            function UpdateLetter(){
-                letterToDisplay = text[currentLetter];
-                console.log("Letter to display", letterToDisplay);
-                let arrToDisplay = letters[letterToDisplay];
+        
 
-                displayLetter(arrToDisplay, dotNumber);
-
-                currentLetter++;
-                if(currentLetter >= maxLetters){
-                    clearInterval(upadteIterator);
-                }
-                dotNumber++;
-
-                if(currentLetter === messageLetters){
-                    clearInterval(upadteIterator);
-                    if(currentLetter < maxLetters){
-                        deleteIterator = setInterval(DeleteLetter, 100)
-                    }
-                }
-            }
-            //=========================================================================================
-            upadteIterator = setInterval(UpdateLetter, 100);
-        });
         
     </script>
 
