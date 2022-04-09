@@ -11,7 +11,7 @@
             flex-wrap: wrap ;
             width: 45px;
             margin-right: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             padding: 0;
         }
         .dot{
@@ -40,7 +40,17 @@
             font-size: 28px;
             font-family: 'Courier New', Courier, monospace;
             font-weight: bolder;
-            width: 800px;
+            width: 575px;
+        }
+        button{
+            font-size: 28px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bolder;
+        }
+        select{
+            font-size: 28px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bolder;
         }
 
     </style>
@@ -49,17 +59,25 @@
     <div class="all">
 
     </div>
-    <input type="text" id="input" placeholder="draw as you type">
-    <input type="text" id="input2" placeholder="first type then draw">
+    <!--<input type="text" id="input" placeholder="draw as you type">-->
+    <select id="row-select">
+        <option value="0" >Row 1</option>
+        <option value="1" >Row 2</option>
+        <option value="2" >Row 3</option>
+        <option value="3" >Row 4</option>
+    </select>
+    <input maxlength="34" type="text" id="input2" placeholder="Type your message and hit [Draw]">
     <button id="drawButton">Draw</button>
 
     <script type="text/javascript">
-        let lettersCount = 81;
+        let lettersCountPerRow = 34;
+        let allLetters = 136;
         let all = document.getElementsByClassName("all")[0];
         let input = document.getElementById("input");
         let input2 = document.getElementById("input2");
+        let row = document.getElementById("row-select");  
         all.innerHTML = "";
-        for(let i = 0; i < lettersCount; i++) {
+        for(let i = 0; i < allLetters; i++) {
             all.innerHTML += `<div class="letter">`;
             let currletter = document.getElementsByClassName("letter")[i];
             for(let j = 0; j < 35; j++){
@@ -111,7 +129,7 @@
             ":": [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
          }
 
-        input.addEventListener("input", function (){
+        /*input.addEventListener("input", function (){
             let text = input.value;
             console.log(text);
             text = text.split("");
@@ -126,11 +144,11 @@
                 }
                 temp = i;
             }
-            for(let i = temp + 1; i < lettersCount; i++){
+            for(let i = temp + 1; i < lettersCouPerRow; i++){
                 let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 displayLetter(arrToDisplay, i);
             }
-        });
+        });*/
 
         function displayLetter(arrToDisplay, i){
             for(let j = 0; j < arrToDisplay.length; j++){
@@ -146,19 +164,22 @@
         let drawButton = document.getElementById("drawButton");
 
         drawButton.addEventListener("click", function(){
+            let rowNumber = Number(row.value);
             let text = input2.value;
             let upadteIterator, deleteIterator;
             let currentLetter = 0;
+            let dotNumber = rowNumber * lettersCountPerRow;
             let messageLetters = input2.value.length;
-            let maxLetters = lettersCount;
+            let maxLetters = lettersCountPerRow;
             let letterToDisplay;
             //=========================================================================================
             function DeleteLetter(){
                 let arrToDisplay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                displayLetter(arrToDisplay, currentLetter);
+                displayLetter(arrToDisplay, dotNumber);
 
-                console.log("Delete current letter", currentLetter);
+                //console.log("Delete current letter", currentLetter);
                 currentLetter++;
+                dotNumber++;
 
                 if(currentLetter === maxLetters){
                     clearInterval(deleteIterator);
@@ -169,11 +190,15 @@
                 letterToDisplay = text[currentLetter];
                 console.log("Letter to display", letterToDisplay);
                 let arrToDisplay = letters[letterToDisplay];
-                displayLetter(arrToDisplay, currentLetter);
 
-                console.log("Update current letter", currentLetter);
+                displayLetter(arrToDisplay, dotNumber);
 
                 currentLetter++;
+                if(currentLetter >= maxLetters){
+                    clearInterval(upadteIterator);
+                }
+                dotNumber++;
+
                 if(currentLetter === messageLetters){
                     clearInterval(upadteIterator);
                     if(currentLetter < maxLetters){
